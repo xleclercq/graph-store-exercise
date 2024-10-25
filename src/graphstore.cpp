@@ -1,6 +1,8 @@
 #include "graphstore.h"
 #include <map>
+#include <queue>
 #include <stdexcept>
+#include <iostream>
 
 namespace
 {
@@ -24,20 +26,36 @@ namespace
         return total_path;
     }
 
-    VertexId cheapestVertex(const std::set<VertexId>& open_set, const std::map<VertexId, int>& f_score)
+    class VertexAndScore
     {
-        VertexId cheapest_vertex;
-        int current_lowest_score = std::numeric_limits<int>::max();
-        for (VertexId vertex : open_set)
+    public:
+        VertexAndScore(VertexId vertex, int score) : m_vertex(vertex), m_score(score) {};
+
+        bool operator<(const VertexAndScore& other) const
         {
-            int current_score = Cost(f_score, vertex);
-            if (current_score < current_lowest_score)
+            if (m_score < other.m_score)
             {
-                cheapest_vertex = vertex;
-                current_lowest_score = current_score;
+                return true;
+            }
+            else if (m_score > other.m_score)
+            {
+                return false;
+            }
+            else
+            {
+                return m_vertex < other.m_vertex;
             }
         }
-        return cheapest_vertex;
+
+        VertexId m_vertex;
+        int m_score;
+    };
+
+    VertexId cheapestVertex(std::set<VertexAndScore>& open_set)
+    {
+        VertexId top = open_set.begin()->m_vertex;
+        open_set.erase(open_set.begin());
+        return top;
     }
 }
 
@@ -78,7 +96,8 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
     // The set of discovered nodes that may need to be (re-)expanded.
     // Initially, only the start node is known.
     // This is usually implemented as a min-heap or priority queue rather than a hash-set.
-    std::set<VertexId> open_set = {from};
+    std::set<VertexAndScore> open_set;
+    open_set.insert(VertexAndScore(from, 0));
     
     // For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from the start
     // to n currently known.
@@ -88,21 +107,15 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
     std::map<VertexId, int> g_score;
     g_score[from] = 0;
 
-    // For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
-    // how cheap a path could be from start to finish if it goes through n.
-    std::map<VertexId, int> f_score;
-    f_score[from] = 0;
-
     while (!open_set.empty())
     {
         // This operation can occur in O(Log(N)) time if openSet is a min-heap or a priority queue
-        VertexId current_vertex = cheapestVertex(open_set, f_score);
+        VertexId current_vertex = cheapestVertex(open_set);
         if (current_vertex == to)
         {
             return ReconstructPath(came_from, current_vertex);
         }
         
-        open_set.erase(current_vertex);
         for (const VertexId& neighbour : m_vertices[current_vertex-1])
         {
             if (m_labels.at(label).count(neighbour) == 0)
@@ -118,8 +131,7 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
                 // This path to neighbor is better than any previous one. Record it!
                 came_from[neighbour] = current_vertex;
                 g_score[neighbour] = tentative_g_score;
-                f_score[neighbour] = tentative_g_score;
-                open_set.insert(neighbour);
+                open_set.insert(VertexAndScore(neighbour, tentative_g_score));
             }
         }
     }
