@@ -1,5 +1,6 @@
 #include "graphstore.h"
 #include <map>
+#include <stdexcept>
 
 namespace
 {
@@ -49,13 +50,31 @@ VertexId GraphStore::createVertex()
 
 void GraphStore::createEdge(VertexId from, VertexId to)
 {
-    // TODO check for existence
+    if (((from - 1) > m_vertices.size()) || ((to - 1) > m_vertices.size()))
+    {
+        throw std::runtime_error("Vertex does not exist");
+    }
 
     m_vertices[from-1].insert(to);
 }
 
-std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to) const
+void GraphStore::addLabel(VertexId vertex, const std::string& label)
 {
+    m_labels[label].insert(vertex);
+}
+
+void GraphStore::removeLabel(VertexId vertex, const std::string& label)
+{
+    m_labels[label].erase(vertex);
+}
+
+std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const std::string& label) const
+{
+    if (m_labels.at(label).count(from) == 0)
+    {
+        return std::vector<VertexId>();
+    }
+    
     // The set of discovered nodes that may need to be (re-)expanded.
     // Initially, only the start node is known.
     // This is usually implemented as a min-heap or priority queue rather than a hash-set.
@@ -86,6 +105,11 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to) const
         open_set.erase(current_vertex);
         for (const VertexId& neighbour : m_vertices[current_vertex-1])
         {
+            if (m_labels.at(label).count(neighbour) == 0)
+            {
+                continue;
+            }
+
             // d(current,neighbor) is the weight of the edge from current to neighbor
             // tentative_g_score is the distance from start to the neighbor through current
             int tentative_g_score = Cost(g_score, current_vertex) + 1;

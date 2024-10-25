@@ -27,7 +27,8 @@ namespace
         const size_t vertex_count = 100000;
         for (size_t i = 0; i < vertex_count; ++i)
         {
-            graph_store.createVertex();
+            VertexId v_id = graph_store.createVertex();
+            graph_store.addLabel(v_id, "label 1");
         }
 
         std::mt19937 rng(0);
@@ -50,11 +51,13 @@ namespace
         GraphStore graph_store;
 
         VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
         VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
 
         graph_store.createEdge(v_id_1, v_id_2);
 
-        const auto path = graph_store.shortestPath(v_id_1, v_id_2);
+        const auto path = graph_store.shortestPath(v_id_1, v_id_2, "label 1");
         PrintPath(path);
     }
 
@@ -63,12 +66,15 @@ namespace
         GraphStore graph_store;
 
         VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
         VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
         VertexId v_id_3 = graph_store.createVertex();
+        graph_store.addLabel(v_id_3, "label 1");
 
         graph_store.createEdge(v_id_1, v_id_2);
 
-        const auto path = graph_store.shortestPath(v_id_1, v_id_3);
+        const auto path = graph_store.shortestPath(v_id_1, v_id_3, "label 1");
         PrintPath(path);
     }
 
@@ -77,31 +83,15 @@ namespace
         GraphStore graph_store;
 
         VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
         VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
         VertexId v_id_3 = graph_store.createVertex();
+        graph_store.addLabel(v_id_3, "label 1");
 
         graph_store.createEdge(v_id_1, v_id_3);
 
-        const auto path = graph_store.shortestPath(v_id_1, v_id_2);
-        PrintPath(path);
-    }
-
-    void SimpleTest5()
-    {
-        GraphStore graph_store;
-
-        VertexId v_id_1 = graph_store.createVertex();
-        VertexId v_id_2 = graph_store.createVertex();
-        VertexId v_id_3 = graph_store.createVertex();
-        VertexId v_id_4 = graph_store.createVertex();
-        VertexId v_id_5 = graph_store.createVertex();
-
-        graph_store.createEdge(v_id_1, v_id_2);
-        graph_store.createEdge(v_id_2, v_id_3);
-        graph_store.createEdge(v_id_3, v_id_4);
-        graph_store.createEdge(v_id_4, v_id_5);
-
-        const auto path = graph_store.shortestPath(v_id_1, v_id_5);
+        const auto path = graph_store.shortestPath(v_id_1, v_id_2, "label 1");
         PrintPath(path);
     }
 
@@ -110,13 +100,98 @@ namespace
         GraphStore graph_store;
 
         VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
         VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
         VertexId v_id_3 = graph_store.createVertex();
+        graph_store.addLabel(v_id_3, "label 1");
 
         graph_store.createEdge(v_id_1, v_id_2);
         graph_store.createEdge(v_id_2, v_id_3);
 
-        const auto path = graph_store.shortestPath(v_id_1, v_id_3);
+        const auto path = graph_store.shortestPath(v_id_1, v_id_3, "label 1");
+        PrintPath(path);
+    }
+
+    void SimpleTest5()
+    {
+        GraphStore graph_store;
+
+        VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
+        VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
+        VertexId v_id_3 = graph_store.createVertex();
+        graph_store.addLabel(v_id_3, "label 1");
+        VertexId v_id_4 = graph_store.createVertex();
+        graph_store.addLabel(v_id_4, "label 1");
+        VertexId v_id_5 = graph_store.createVertex();
+        graph_store.addLabel(v_id_5, "label 1");
+
+        graph_store.createEdge(v_id_1, v_id_2);
+        graph_store.createEdge(v_id_2, v_id_3);
+        graph_store.createEdge(v_id_3, v_id_4);
+        graph_store.createEdge(v_id_4, v_id_5);
+
+        const auto path = graph_store.shortestPath(v_id_1, v_id_5, "label 1");
+        PrintPath(path);
+    }
+
+    void SimpleTest6()
+    {
+        GraphStore graph_store;
+
+        VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
+        VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
+        VertexId v_id_3 = graph_store.createVertex();
+        VertexId v_id_4 = graph_store.createVertex();
+        graph_store.addLabel(v_id_4, "label 1");
+        VertexId v_id_5 = graph_store.createVertex();
+        graph_store.addLabel(v_id_5, "label 1");
+
+        graph_store.createEdge(v_id_1, v_id_2);
+        graph_store.createEdge(v_id_2, v_id_3);
+        graph_store.createEdge(v_id_3, v_id_4);
+        graph_store.createEdge(v_id_4, v_id_5);
+
+        const auto path = graph_store.shortestPath(v_id_1, v_id_5, "label 1");
+        PrintPath(path);
+    }
+
+    void SimpleTest7()
+    {
+        GraphStore graph_store;
+
+        VertexId v_id_1 = graph_store.createVertex();
+        graph_store.addLabel(v_id_1, "label 1");
+        VertexId v_id_2 = graph_store.createVertex();
+        graph_store.addLabel(v_id_2, "label 1");
+        VertexId v_id_3 = graph_store.createVertex();
+        VertexId v_id_4 = graph_store.createVertex();
+        graph_store.addLabel(v_id_4, "label 1");
+        VertexId v_id_5 = graph_store.createVertex();
+        graph_store.addLabel(v_id_5, "label 1");
+
+        VertexId v_id_6 = graph_store.createVertex();
+        graph_store.addLabel(v_id_6, "label 1");
+        VertexId v_id_7 = graph_store.createVertex();
+        graph_store.addLabel(v_id_7, "label 1");
+
+
+        graph_store.createEdge(v_id_1, v_id_2);
+
+        graph_store.createEdge(v_id_2, v_id_3);
+        graph_store.createEdge(v_id_3, v_id_4);
+
+        graph_store.createEdge(v_id_2, v_id_6);
+        graph_store.createEdge(v_id_6, v_id_7);
+        graph_store.createEdge(v_id_7, v_id_4);
+
+        graph_store.createEdge(v_id_4, v_id_5);
+
+        const auto path = graph_store.shortestPath(v_id_1, v_id_5, "label 1");
         PrintPath(path);
     }
 
@@ -137,7 +212,7 @@ namespace
 
             auto t1 = std::chrono::high_resolution_clock::now();
             
-            const auto path = graph_store.shortestPath(from, to);
+            const auto path = graph_store.shortestPath(from, to, "label 1");
 
             auto t2 = std::chrono::high_resolution_clock::now();
 
@@ -164,7 +239,7 @@ namespace
             
             auto t1 = std::chrono::high_resolution_clock::now();
 
-            const auto path = graph_store.shortestPath(from, to);
+            const auto path = graph_store.shortestPath(from, to, "label 1");
 
             auto t2 = std::chrono::high_resolution_clock::now();
 
@@ -184,12 +259,14 @@ int main(int argc, char* argv[])
         SimpleTest3();
         SimpleTest4();
         SimpleTest5();
+        SimpleTest6();
+        SimpleTest7();
         PerfTest1();
         PerfTest2();
     }
     catch (...)
     {
-        std::cerr << "Exceptiom thrown" << std::endl;
+        std::cerr << "Exception thrown" << std::endl;
     }
 
     return 0;
