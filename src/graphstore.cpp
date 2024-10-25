@@ -7,6 +7,9 @@
 
 namespace
 {
+    // The wikipedia algorithm we refer to in shortestPath fills some of the sets with infinity. This is wasteful as
+    // we'd have to add all the vertices even the ones we'll never visit. Just assume that if it's not in the set its
+    // score is infinity.
     int Cost(const std::map<VertexId, int>& scores, VertexId vertex)
     {
         if (scores.count(vertex) > 0)
@@ -26,7 +29,9 @@ namespace
         }
         return total_path;
     }
-
+        
+    // Class used to implement a heap with a std::set. This is used in the A* algorithm and helps us identify the vertex
+    // with the lowest score efficiently.
     class VertexAndScore
     {
     public:
@@ -103,6 +108,10 @@ void GraphStore::removeLabel(VertexId vertex, const std::string& label)
 
 std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const std::string& label) const
 {
+    // This is an implementation of the A* algorithm as described in https://en.wikipedia.org/wiki/A*_search_algorithm
+    // With h(vertex) always 0 and d(vertex_1, vertex_2) always 1 since our graph doesn't have a weight on the edges.
+    // Essentially this disable the heuristic part of the A* algorithm.
+
     if (((from - 1) > m_vertices.size()) || ((to - 1) > m_vertices.size()))
     {
         throw std::runtime_error("Vertex does not exist");
@@ -113,23 +122,18 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
         return std::vector<VertexId>();
     }
     
-    // The set of discovered nodes that may need to be (re-)expanded.
-    // Initially, only the start node is known.
-    // This is usually implemented as a min-heap or priority queue rather than a hash-set.
+    // This as heap implementation based on std::set. We use a custom class, VertexAndScore, with a custom operator< to
+    // make sure the element with the lowest score is at the beginning of the set.
     std::set<VertexAndScore> open_set;
     open_set.insert(VertexAndScore(from, 0));
     
-    // For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from the start
-    // to n currently known.
     std::map<VertexId, VertexId> came_from;
 
-    // For node n, gScore[n] is the cost of the cheapest path from start to n currently known.
     std::map<VertexId, int> g_score;
     g_score[from] = 0;
 
     while (!open_set.empty())
     {
-        // This operation can occur in O(Log(N)) time if openSet is a min-heap or a priority queue
         VertexId current_vertex = cheapestVertex(open_set);
         if (current_vertex == to)
         {
@@ -143,12 +147,9 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
                 continue;
             }
 
-            // d(current,neighbor) is the weight of the edge from current to neighbor
-            // tentative_g_score is the distance from start to the neighbor through current
             int tentative_g_score = Cost(g_score, current_vertex) + 1;
             if (tentative_g_score < Cost(g_score, neighbour))
             {
-                // This path to neighbor is better than any previous one. Record it!
                 came_from[neighbour] = current_vertex;
                 g_score[neighbour] = tentative_g_score;
                 open_set.insert(VertexAndScore(neighbour, tentative_g_score));
@@ -156,6 +157,5 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const
         }
     }
 
-    // Open set is empty but goal was never reached
     return std::vector<VertexId>();
 }
