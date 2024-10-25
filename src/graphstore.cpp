@@ -1,4 +1,5 @@
 #include "graphstore.h"
+#include <limits>
 #include <map>
 #include <queue>
 #include <stdexcept>
