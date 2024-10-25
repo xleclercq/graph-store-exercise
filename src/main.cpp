@@ -32,7 +32,7 @@ namespace
         }
 
         std::mt19937 rng(0);
-        std::uniform_int_distribution<std::mt19937::result_type> dist(1, vertex_count);
+        std::uniform_int_distribution<std::mt19937::result_type> dist(1, static_cast<std::mt19937::result_type>(vertex_count));
         for (size_t i = 0; i < edge_count; ++i)
         {
             VertexId from = dist(rng);

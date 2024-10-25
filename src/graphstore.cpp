@@ -79,16 +79,35 @@ void GraphStore::createEdge(VertexId from, VertexId to)
 
 void GraphStore::addLabel(VertexId vertex, const std::string& label)
 {
+    if ((vertex - 1) > m_vertices.size())
+    {
+        throw std::runtime_error("Vertex does not exist");
+    }
+
     m_labels[label].insert(vertex);
 }
 
 void GraphStore::removeLabel(VertexId vertex, const std::string& label)
 {
+    if ((vertex - 1) > m_vertices.size())
+    {
+        throw std::runtime_error("Vertex does not exist");
+    }
+
     m_labels[label].erase(vertex);
+    if (m_labels[label].empty())
+    {
+        m_labels.erase(label);
+    }
 }
 
 std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to, const std::string& label) const
 {
+    if (((from - 1) > m_vertices.size()) || ((to - 1) > m_vertices.size()))
+    {
+        throw std::runtime_error("Vertex does not exist");
+    }
+
     if (m_labels.at(label).count(from) == 0)
     {
         return std::vector<VertexId>();
