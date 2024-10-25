@@ -51,7 +51,7 @@ void GraphStore::createEdge(VertexId from, VertexId to)
 {
     // TODO check for existence
 
-    m_vertices[from].insert(to);
+    m_vertices[from-1].insert(to);
 }
 
 std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to) const
@@ -84,7 +84,7 @@ std::vector<VertexId> GraphStore::shortestPath(VertexId from, VertexId to) const
         }
         
         open_set.erase(current_vertex);
-        for (const VertexId& neighbour : m_vertices[current_vertex])
+        for (const VertexId& neighbour : m_vertices[current_vertex-1])
         {
             // d(current,neighbor) is the weight of the edge from current to neighbor
             // tentative_g_score is the distance from start to the neighbor through current
